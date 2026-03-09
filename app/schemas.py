@@ -60,7 +60,7 @@ class MatchResponse(BaseModel):
         from_attributes = True
 
 class TopPlayerStats(BaseModel):
-    player_id: int
+    id: int
     name: str
     team_id: int
     goals: int

@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app import models, schemas
-from app.database import get_db
+from app import crud, schemas
+from app.dependencies import get_db
 
 router = APIRouter(
     prefix="/players",
@@ -14,32 +14,31 @@ router = APIRouter(
     "/",
     response_model=list[schemas.PlayerResponse],
     summary="Get all players",
-    description="Retrieve all players in the database. Optionally filter by team ID or position."
+    description="Retrieve all players in the database with optional filters.",
 )
 def get_players(
-    team_id: int | None = Query(None, description="Filter players by team ID"),
-    position: str | None = Query(None, description="Filter players by position (Forward, Midfielder, Defender, Goalkeeper)"),
+    team_id: int | None = Query(
+        None,
+        description="Filter players by team ID"
+    ),
+    position: str | None = Query(
+        None,
+        description="Filter players by position (FWD, MID, DEF, GKP)"
+    ),
     db: Session = Depends(get_db)
 ):
-    query = db.query(models.Player)
-
-    if team_id:
-        query = query.filter(models.Player.team_id == team_id)
-
-    if position:
-        query = query.filter(models.Player.position == position)
-
-    return query.all()
+    return crud.get_players(db, team_id=team_id, position=position)
 
 
 @router.get(
     "/{player_id}",
     response_model=schemas.PlayerResponse,
     summary="Get player by ID",
-    description="Retrieve a single player using their unique player ID."
+    description="Retrieve a single player using their unique ID.",
+    responses={404: {"description": "Player not found"}}
 )
 def get_player(player_id: int, db: Session = Depends(get_db)):
-    player = db.query(models.Player).filter(models.Player.id == player_id).first()
+    player = crud.get_player(db, player_id)
 
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
@@ -51,53 +50,38 @@ def get_player(player_id: int, db: Session = Depends(get_db)):
     "/",
     response_model=schemas.PlayerResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a new player",
-    description="Create a new player record and link it to an existing team."
+    summary="Create a player",
+    description="Create a new player record linked to an existing team."
 )
 def create_player(player: schemas.PlayerCreate, db: Session = Depends(get_db)):
-    new_player = models.Player(**player.dict())
-
-    db.add(new_player)
-    db.commit()
-    db.refresh(new_player)
-
-    return new_player
+    return crud.create_player(db, player)
 
 
 @router.put(
     "/{player_id}",
     response_model=schemas.PlayerResponse,
-    summary="Update a player",
-    description="Update an existing player’s information using their player ID."
+    summary="Update player",
+    description="Update an existing player's information.",
+    responses={404: {"description": "Player not found"}}
 )
-def update_player(player_id: int, player_update: schemas.PlayerCreate, db: Session = Depends(get_db)):
-    player = db.query(models.Player).filter(models.Player.id == player_id).first()
+def update_player(player_id: int, player: schemas.PlayerUpdate, db: Session = Depends(get_db)):
+    updated_player = crud.update_player(db, player_id, player)
 
-    if not player:
+    if not updated_player:
         raise HTTPException(status_code=404, detail="Player not found")
 
-    for key, value in player_update.dict().items():
-        setattr(player, key, value)
-
-    db.commit()
-    db.refresh(player)
-
-    return player
+    return updated_player
 
 
 @router.delete(
     "/{player_id}",
     status_code=status.HTTP_204_NO_CONTENT,
-    summary="Delete a player",
-    description="Delete a player record from the database using their ID."
+    summary="Delete player",
+    description="Remove a player from the database.",
+    responses={404: {"description": "Player not found"}}
 )
 def delete_player(player_id: int, db: Session = Depends(get_db)):
-    player = db.query(models.Player).filter(models.Player.id == player_id).first()
+    success = crud.delete_player(db, player_id)
 
-    if not player:
+    if not success:
         raise HTTPException(status_code=404, detail="Player not found")
-
-    db.delete(player)
-    db.commit()
-
-    return

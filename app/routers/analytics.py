@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
 
-from app import models
-from app.database import get_db
+from app import crud, schemas
+from app.dependencies import get_db
 
 router = APIRouter(
     prefix="/analytics",
@@ -13,124 +12,85 @@ router = APIRouter(
 
 @router.get(
     "/top-scorers",
+    response_model=list[schemas.TopPlayerStats],
     summary="Top goal scorers",
-    description="Return the top goal scorers in the dataset ordered by total goals."
+    description="Return the players with the highest number of goals."
 )
-def top_scorers(limit: int = Query(10, description="Number of players to return"), db: Session = Depends(get_db)):
-    players = (
-        db.query(models.Player.name, models.Player.goals)
-        .order_by(desc(models.Player.goals))
-        .limit(limit)
-        .all()
-    )
-
-    return players
+def top_scorers(
+    limit: int = Query(
+        10,
+        ge=1,
+        le=50,
+        description="Maximum number of players to return"
+    ),
+    db: Session = Depends(get_db)
+):
+    return crud.get_top_scorers(db, limit)
 
 
 @router.get(
     "/top-assists",
+    response_model=list[schemas.TopPlayerStats],
     summary="Top assist providers",
-    description="Return the players with the most assists."
+    description="Return the players with the highest number of assists."
 )
-def top_assists(limit: int = Query(10, description="Number of players to return"), db: Session = Depends(get_db)):
-    players = (
-        db.query(models.Player.name, models.Player.assists)
-        .order_by(desc(models.Player.assists))
-        .limit(limit)
-        .all()
-    )
-
-    return players
+def top_assists(
+    limit: int = Query(
+        10,
+        ge=1,
+        le=50,
+        description="Maximum number of players to return"
+    ),
+    db: Session = Depends(get_db)
+):
+    return crud.get_top_assists(db, limit)
 
 
 @router.get(
     "/highest-scoring-matches",
+    response_model=list[schemas.HighScoringMatchResponse],
     summary="Highest scoring matches",
-    description="Return matches with the highest total goals."
+    description="Return matches with the highest combined goal totals."
 )
-def highest_scoring_matches(limit: int = Query(5, description="Number of matches to return"), db: Session = Depends(get_db)):
-    matches = (
-        db.query(
-            models.Match.id,
-            models.Match.home_team,
-            models.Match.away_team,
-            models.Match.home_goals,
-            models.Match.away_goals,
-            (models.Match.home_goals + models.Match.away_goals).label("total_goals")
-        )
-        .order_by(desc("total_goals"))
-        .limit(limit)
-        .all()
-    )
-
-    return matches
+def highest_scoring_matches(
+    limit: int = Query(
+        10,
+        ge=1,
+        le=50,
+        description="Maximum number of matches to return"
+    ),
+    db: Session = Depends(get_db)
+):
+    return crud.get_highest_scoring_matches(db, limit)
 
 
 @router.get(
     "/league-table",
-    summary="League table for a season",
-    description="Generate a league table summary for a specific season based on match results."
+    response_model=list[schemas.LeagueTableRow],
+    summary="Season league table",
+    description="Generate a league table based on match results for a specific season."
 )
 def league_table(
-    season: str = Query(..., description="Season format example: 2024/25"),
+    season: str = Query(
+        ...,
+        description="Season format example: 2024/25"
+    ),
     db: Session = Depends(get_db)
 ):
-    matches = db.query(models.Match).filter(models.Match.season == season).all()
-
-    table = {}
-
-    for match in matches:
-        home = match.home_team
-        away = match.away_team
-
-        table.setdefault(home, {"points": 0})
-        table.setdefault(away, {"points": 0})
-
-        if match.home_goals > match.away_goals:
-            table[home]["points"] += 3
-        elif match.home_goals < match.away_goals:
-            table[away]["points"] += 3
-        else:
-            table[home]["points"] += 1
-            table[away]["points"] += 1
-
-    result = [
-        {"team": team, "points": data["points"]}
-        for team, data in table.items()
-    ]
-
-    result.sort(key=lambda x: x["points"], reverse=True)
-
-    return result
+    return crud.get_league_table(db, season)
 
 
 @router.get(
     "/team-summary/{team_id}",
+    response_model=schemas.TeamSummaryResponse,
     summary="Team performance summary",
-    description="Return a summary of a team including total matches played and goals scored."
+    description="Return an overview of a team's performance across all matches.",
+    responses={404: {"description": "Team not found"}}
 )
 def team_summary(team_id: int, db: Session = Depends(get_db)):
-    team = db.query(models.Team).filter(models.Team.id == team_id).first()
+    summary = crud.get_team_summary(db, team_id)
 
-    if not team:
-        return {"error": "Team not found"}
+    if not summary:
+        raise HTTPException(status_code=404, detail="Team not found")
 
-    matches = db.query(models.Match).filter(
-        (models.Match.home_team == team.name) |
-        (models.Match.away_team == team.name)
-    ).all()
-
-    total_matches = len(matches)
-
-    total_goals = 0
-    for match in matches:
-        if match.home_team == team.name:
-            total_goals += match.home_goals
-        if match.away_team == team.name:
-            total_goals += match.away_goals
-
-    return {
-        "team_name": team.name,
-        "matches_played": total_matches,
-        "goals_scored": total_goals
-    }
+    return summary
