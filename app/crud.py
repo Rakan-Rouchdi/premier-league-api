@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 
-from app.models import Player
+from app.models import Player, Team, Match
 
 
 def get_players(db: Session, team_id: int | None = None, position: str | None = None):
@@ -50,3 +50,29 @@ def delete_player(db: Session, player_id: int):
     db.delete(player)
     db.commit()
     return player
+
+def get_teams(db: Session):
+    return db.query(Team).all()
+
+
+def get_team(db: Session, team_id: int):
+    return db.query(Team).filter(Team.id == team_id).first()
+
+
+def get_matches(db: Session, season: str | None = None, team_id: int | None = None):
+    query = db.query(Match)
+
+    if season:
+        query = query.filter(Match.season == season)
+
+    if team_id:
+        query = query.filter(
+            (Match.home_team_id == team_id) |
+            (Match.away_team_id == team_id)
+        )
+
+    return query.all()
+
+
+def get_match(db: Session, match_id: int):
+    return db.query(Match).filter(Match.id == match_id).first()
