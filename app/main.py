@@ -7,8 +7,8 @@ from app.routers import players, teams, matches, analytics
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
-    title="Premier League Statistics API",
-    description="API for Premier League players, matches and analytics",
+    title="Premier League Analytics API",
+    description="A REST API for analysing Premier League teams, players, and match data.",
     version="1.0.0"
 )
 
