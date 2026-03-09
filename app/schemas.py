@@ -1,3 +1,5 @@
+from datetime import date
+
 from pydantic import BaseModel
 
 
@@ -39,7 +41,7 @@ class PlayerResponse(PlayerBase):
 
 class MatchResponse(BaseModel):
     id: int
-    match_date: str
+    match_date: date
     season: str
     home_team_id: int
     away_team_id: int
