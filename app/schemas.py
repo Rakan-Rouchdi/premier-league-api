@@ -58,3 +58,49 @@ class MatchResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class TopPlayerStats(BaseModel):
+    player_id: int
+    name: str
+    team_id: int
+    goals: int
+    assists: int
+
+    class Config:
+        from_attributes = True
+
+
+class HighScoringMatchResponse(BaseModel):
+    match_id: int
+    match_date: date
+    season: str
+    home_team_id: int
+    away_team_id: int
+    home_goals: int
+    away_goals: int
+    total_goals: int
+
+
+class LeagueTableRow(BaseModel):
+    team_id: int
+    team_name: str
+    played: int
+    wins: int
+    draws: int
+    losses: int
+    goals_for: int
+    goals_against: int
+    goal_difference: int
+    points: int
+
+
+class TeamSummaryResponse(BaseModel):
+    team_id: int
+    team_name: str
+    matches_played: int
+    wins: int
+    draws: int
+    losses: int
+    goals_for: int
+    goals_against: int
+    points: int
