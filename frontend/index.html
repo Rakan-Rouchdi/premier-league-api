@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premier League Analytics</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Mobile Header -->
+    <header class="mobile-header">
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <div class="mobile-logo">
+            <span class="logo-icon">⚽</span>
+            <span>PL Analytics</span>
+        </div>
+    </header>
+
+    <!-- Sidebar Overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="logo-icon">⚽</span>
+            <div class="logo-text">
+                <h1>Premier League</h1>
+                <p>Analytics Dashboard</p>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span class="nav-label">Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-page="players">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Players</span>
+            </a>
+            <a href="#" class="nav-item" data-page="teams">
+                <span class="nav-icon">🏟️</span>
+                <span class="nav-label">Teams</span>
+            </a>
+            <a href="#" class="nav-item" data-page="matches">
+                <span class="nav-icon">📅</span>
+                <span class="nav-label">Matches</span>
+            </a>
+            <a href="#" class="nav-item" data-page="analytics">
+                <span class="nav-icon">📈</span>
+                <span class="nav-label">Analytics</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <p>Built with FastAPI</p>
+            <p class="version">v1.0.0</p>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content" id="mainContent">
+        <!-- Page content will be injected here -->
+    </main>
+
+    <!-- Modal Container -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle">Modal Title</h2>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Modal content injected here -->
+            </div>
+            <div class="modal-footer" id="modalFooter" style="display: none;">
+                <!-- Modal footer injected here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/dashboard.js"></script>
+    <script src="/static/js/players.js"></script>
+    <script src="/static/js/teams.js"></script>
+    <script src="/static/js/matches.js"></script>
+    <script src="/static/js/analytics.js"></script>
+</body>
+</html>
