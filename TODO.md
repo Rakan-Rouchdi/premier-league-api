@@ -15,7 +15,7 @@
 
 ## Testing Completed
 
-- [x] Dashboard — loads with stats (562 players, 56 teams, 9,380 matches, 25,495 goals)
+- [x] Dashboard — loads with stats (562 players, 46 teams, 9,380 matches, 25,495 goals)
 - [x] Players page — table renders with search, filters, Add Player button, Edit/Delete actions
 - [x] Players CRUD — Add Player modal opens with all form fields (Name, Team, Position, etc.)
 - [x] Players Edit — Edit Player modal pre-populates with correct data (tested with Mohamed Salah)
@@ -36,9 +36,17 @@
 - [x] Bug fix: Team Summary JSON parsing error (special chars in team names) — FIXED
 - [x] Bug fix: Modal submit button hidden below viewport — restructured to flex column with sticky footer
 
+## Data Quality Fix
+
+- [x] Identified 10 duplicate team name pairs (matches CSV uses short names, players CSV uses full names)
+- [x] Added `TEAM_NAME_MAP` and `normalise_team_name()` to `app/services/import_data.py`
+- [x] Re-imported data: 46 teams (was 56), 562 players, 9,380 matches — all correctly linked
+- [x] Verified Man City: 31 players + 900 matches + 1,670 points (data properly merged)
+- [x] Data quality audit: zero nulls, zero duplicates, zero negative values, all dates valid
+
 ## All Tests Passing
 
-- [x] 14/14 pytest tests passed (0.51s)
+- [x] 14/14 pytest tests passed (0.79s)
 - [x] 4 Pydantic deprecation warnings (non-blocking, cosmetic only)
 
 ## Render Deployment Ready
