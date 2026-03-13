@@ -8,6 +8,18 @@ In addition to the backend API, the project includes a lightweight **browser-bas
 
 ---
 
+## API Documentation
+
+Complete API documentation is available in the following file:
+
+docs/API_Documentation.pdf
+
+The documentation describes all available endpoints, parameters, request formats, and expected JSON responses.
+
+Interactive API documentation is also automatically generated using FastAPI's OpenAPI integration and can be accessed through:
+
+http://127.0.0.1:8000/docs
+
 ## Features
 
 The API provides the following functionality.
@@ -284,26 +296,6 @@ Generative AI tools were used during development to assist with:
 - API structure design
 - documentation drafting
 
-All AI usage followed the coursework guidelines and was used as a development aid rather than replacing independent implementation.
-
----
-
-## Deployment
-
-This application is ready for deployment on Render.com. See the [DEPLOYMENT.md](DEPLOYMENT.md) file for detailed instructions on how to deploy the application.
-
-## Future Improvements
-
-Potential future enhancements include:
-
-- Authentication and user accounts
-- Advanced player analytics
-- Team comparison analytics
-- Caching for analytical queries
-- Additional frontend visualizations (charts, graphs)
-- Progressive Web App (PWA) capabilities
-
----
 
 ## Author
 
