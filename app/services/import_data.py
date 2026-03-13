@@ -10,6 +10,27 @@ from app.models import Match, Player, Team
 MATCHES_CSV = "data/matches.csv"
 PLAYERS_CSV = "data/players.csv"
 
+# Mapping of full/alternative team names to their canonical short names.
+# The matches CSV uses short names consistently across 25 seasons,
+# while the players CSV uses full official names for current teams.
+TEAM_NAME_MAP = {
+    "Brighton & Hove Albion": "Brighton",
+    "Ipswich Town": "Ipswich",
+    "Leicester City": "Leicester",
+    "Manchester City": "Man City",
+    "Manchester United": "Man United",
+    "Newcastle United": "Newcastle",
+    "Nottingham Forest": "Nott'm Forest",
+    "Tottenham Hotspur": "Tottenham",
+    "West Ham United": "West Ham",
+    "Wolverhampton Wanderers": "Wolves",
+}
+
+
+def normalise_team_name(name: str) -> str:
+    """Return the canonical short name for a team."""
+    return TEAM_NAME_MAP.get(name, name)
+
 
 def parse_date(date_str: str):
     return datetime.strptime(date_str, "%Y-%m-%d").date()
@@ -17,7 +38,7 @@ def parse_date(date_str: str):
 
 def import_teams(db: Session, matches_df: pd.DataFrame, players_df: pd.DataFrame):
     match_teams = set(matches_df["HomeTeam"].dropna().unique()) | set(matches_df["AwayTeam"].dropna().unique())
-    player_teams = set(players_df["Club"].dropna().unique())
+    player_teams = {normalise_team_name(t) for t in players_df["Club"].dropna().unique()}
     all_teams = sorted(match_teams | player_teams)
 
     existing_team_names = {team.name for team in db.query(Team).all()}
@@ -37,7 +58,8 @@ def import_players(db: Session, players_df: pd.DataFrame):
     teams = {team.name: team.id for team in db.query(Team).all()}
 
     for _, row in players_df.iterrows():
-        team_id = teams.get(row["Club"])
+        club_name = normalise_team_name(row["Club"])
+        team_id = teams.get(club_name)
         if not team_id:
             continue
 
@@ -91,6 +113,11 @@ def import_matches(db: Session, matches_df: pd.DataFrame):
 
 
 def run_import():
+    from app.database import Base, engine
+
+    # Create all tables if they don't exist
+    Base.metadata.create_all(bind=engine)
+
     db = SessionLocal()
 
     try:

@@ -4,6 +4,8 @@ A RESTful API built with **FastAPI** that provides access to Premier League data
 
 The system integrates real-world datasets and demonstrates modern backend development practices including API design, database integration, analytics queries, automated testing, and documentation.
 
+In addition to the backend API, the project includes a lightweight **browser-based front-end dashboard** that consumes the API and demonstrates real-world usage of the service.
+
 ---
 
 ## Features
@@ -38,6 +40,19 @@ The API provides the following functionality.
 - League table by season
 - Team performance summary
 
+### Front-End Dashboard
+
+A responsive front-end interface was developed to interact with the API.
+
+The dashboard allows users to:
+
+- Browse players, teams, and matches
+- Perform player CRUD operations
+- View league analytics and summaries
+- Navigate data through a simple user interface
+
+The front-end consumes the API using JavaScript `fetch` requests and demonstrates how the backend service can be used in a real application.
+
 ---
 
 ## Technology Stack
@@ -49,6 +64,7 @@ The API provides the following functionality.
 | ORM | SQLAlchemy |
 | Data Validation | Pydantic |
 | Testing | Pytest |
+| Frontend | HTML, CSS, JavaScript |
 | Documentation | Swagger / OpenAPI |
 
 ---
@@ -75,6 +91,18 @@ premier-league-api
 │   ├── schemas.py
 │   └── main.py
 │
+├── frontend
+│   ├── index.html
+│   ├── css
+│   │   └── styles.css
+│   └── js
+│       ├── app.js
+│       ├── dashboard.js
+│       ├── players.js
+│       ├── teams.js
+│       ├── matches.js
+│       └── analytics.js
+│
 ├── data
 │   ├── matches.csv
 │   └── players.csv
@@ -89,7 +117,8 @@ premier-league-api
 ├── slides
 ├── report
 ├── pytest.ini
-└── requirements.txt
+├── requirements.txt
+└── README.md
 ```
 
 ---
@@ -168,6 +197,26 @@ Swagger UI allows interactive testing of all endpoints.
 
 ---
 
+## Running the Front-End Dashboard
+
+After starting the API server, the front-end dashboard is automatically served at the root URL:
+
+```
+http://127.0.0.1:8000/
+```
+
+The dashboard communicates with the API using JavaScript fetch requests and allows users to:
+
+- View a dashboard with key statistics
+- Browse, search, and filter players, teams, and matches
+- Perform full CRUD operations on players
+- View analytics including top scorers, assists, and league tables
+- Explore team performance summaries
+
+The frontend is responsive and works on desktop, tablet, and mobile devices.
+
+---
+
 ## Example Endpoints
 
 ### Players
@@ -239,15 +288,20 @@ All AI usage followed the coursework guidelines and was used as a development ai
 
 ---
 
+## Deployment
+
+This application is ready for deployment on Render.com. See the [DEPLOYMENT.md](DEPLOYMENT.md) file for detailed instructions on how to deploy the application.
+
 ## Future Improvements
 
 Potential future enhancements include:
 
-- authentication and user accounts
-- advanced player analytics
-- team comparison analytics
-- caching for analytical queries
-- deployment to a cloud platform
+- Authentication and user accounts
+- Advanced player analytics
+- Team comparison analytics
+- Caching for analytical queries
+- Additional frontend visualizations (charts, graphs)
+- Progressive Web App (PWA) capabilities
 
 ---
 
